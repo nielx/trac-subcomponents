@@ -112,7 +112,7 @@ function selectedComponentChanged(e) {
 		// If there are any entries in the select to the right, show it
 		// otherwise break out of the loop as we are done
 		if (items.length)
-			currentSelector.next().show();
+			currentSelector.next().css("display", "");
 		else
 			break;
 		
