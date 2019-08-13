@@ -9,7 +9,7 @@ from setuptools import setup
 
 setup(
     name = 'TracSubcomponents',
-    version = '1.2.1',
+    version = '1.3.0',
     packages = ['subcomponents'],
     package_data = { 'subcomponents': ['htdocs/*.js'] },
 
@@ -18,7 +18,7 @@ setup(
     description = 'Provides support for subcomponents in the interface.',
     license = 'MIT',
     keywords = 'trac plugin ticket query components',
-    url = 'http://hg.haiku-os.org/trac-subcomponents',
+    url = 'https://github.com/nielx/trac-subcomponents',
     classifiers = [
         'Framework :: Trac',
         #'Development Status :: 1 - Planning',
@@ -35,7 +35,7 @@ setup(
         'Programming Language :: Python',
     ],
     
-    install_requires = ['Trac>=1.0dev',],
+    install_requires = ['Trac>=1.3.5',],
 
     entry_points = {
         'trac.plugins': [
