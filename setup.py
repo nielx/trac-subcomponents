@@ -35,7 +35,7 @@ setup(
         'Programming Language :: Python',
     ],
     
-    install_requires = ['Trac>=1.3.5',],
+    install_requires = ['Trac>=1.2',],
 
     entry_points = {
         'trac.plugins': [
