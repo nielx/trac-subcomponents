@@ -278,9 +278,13 @@ function initialiseComponents() {
 
     // Ticket/Newticket page: component field
     // Original comment: Opera picks up .names in getElementById(), hence it being at the end now
-    if (jQuery('#field-component').length)
+    if (jQuery('#field-component').length) {
         convertComponentSelect(jQuery('#field-component')[0], false); // For the new ticket page
-
+        // In Trac 1.2.x, the property white-space: nowrap is set, which will cause the subcomponent select
+        // boxes to not wrap. See https://dev.haiku-os.org/ticket/13333
+        // In Trac 1.3.x and later this is fixed. Set this property explicitly on the element.
+        jQuery('#field-component').parent().css("white-space", "normal");
+    }
     // Component Admin: add the [ ] rename children checkbox when applicable
     if (typeof rename_children !== 'undefined' && rename_children)
         addRenameChildrenCheckbox();
