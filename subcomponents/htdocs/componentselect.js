@@ -224,11 +224,15 @@ window.gComponentList = new Array();
 window.gMaxBranches = 0;
 window.gComponentCount = 0;
 
+function addRenameChildrenCheckbox() {
+    const element = jQuery('<div class="field"><label><input name="renamechildren" id="renamechildren" type="checkbox" checked="checked"/>&nbsp;Also rename children</label></div>');
+    element.insertAfter(jQuery('div.field')[1]);
+}
+
 // This function creates a MutationObserver that will catch all newly created filters
 // on the query page and converts the component filter into a subcomponent list
 function monitorQueryComponents() {
     var target = jQuery('table.trac-clause')[0];
-
     // Create an observer instance
     var observer = new MutationObserver(function (mutations) {
         mutations.forEach(function (mutation) {
@@ -276,6 +280,10 @@ function initialiseComponents() {
     // Original comment: Opera picks up .names in getElementById(), hence it being at the end now
     if (jQuery('#field-component').length)
         convertComponentSelect(jQuery('#field-component')[0], false); // For the new ticket page
+
+    // Component Admin: add the [ ] rename children checkbox when applicable
+    if (typeof rename_children !== 'undefined' && rename_children)
+        addRenameChildrenCheckbox();
 
     // Legacy: is this (still) necessary?
     // now we need to query any radio groups for Mozilla breakage: http://www.quirksmode.org/js/tests/moz_radios.html

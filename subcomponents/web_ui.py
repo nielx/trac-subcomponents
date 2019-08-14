@@ -1,5 +1,5 @@
  #
- # Copyright 2009, Niels Sascha Reedijk <niels.reedijk@gmail.com>
+ # Copyright 2009-2019, Niels Sascha Reedijk <niels.reedijk@gmail.com>
  # All rights reserved. Distributed under the terms of the MIT License.
  #
 
@@ -9,8 +9,9 @@ from trac.core import *
 from trac.ticket import model
 from trac.util.text import unicode_quote_plus
 from trac.web.api import IRequestFilter
-from trac.web.chrome import ITemplateProvider, add_notice, add_script
+from trac.web.chrome import ITemplateProvider, add_notice, add_script, add_script_data
 from trac.util.translation import _
+
 
 class SubComponentsModule(Component):
     """Implements subcomponents in Trac's interface."""
@@ -103,6 +104,12 @@ class SubComponentsModule(Component):
 
                 # Now store the new milestone component groups
                 data['groups'] = newgroups
+
+        if template == "admin_components.html" and data['view'] == 'detail':
+            if len(self._get_component_children(data['component'].name)) > 0:
+                add_script(req, 'subcomponents/componentselect.js')
+                add_script_data(req, {"rename_children": True})
+
         return template, data, content_type
 
 
@@ -119,18 +126,6 @@ class SubComponentsModule(Component):
         """
         return ""
 
-
-    # ITemplateStreamFilter methods
-    def filter_stream(self, req, method, filename, stream, data):
-        if filename == "admin_components.html":
-            # If we are at detail editing of a component, and it has
-            # children, then add a checkbox to rename those.
-            if data['view'] == 'detail':
-                if len(self._get_component_children(data['component'].name)) > 0:
-                    stream |= Transformer("//div[@class='field'][1]").after(self._build_renamechildren_field())
-        return stream
-    
-    
     # Other functions
     def _get_component_children(self, name):
         components = model.Component.select(self.env)
@@ -139,10 +134,3 @@ class SubComponentsModule(Component):
             if component.name.startswith(name) and component.name != name:
                 result.append(component)
         return result
-    
-    def _build_renamechildren_field(self):
-        return tag.div(tag.label(tag.input(_("Also rename children"), \
-                                           type='checkbox', id='renamechildren', \
-                                           name='renamechildren', checked='checked') \
-                                ), \
-                       class_='field')
