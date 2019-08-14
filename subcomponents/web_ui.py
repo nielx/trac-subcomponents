@@ -4,22 +4,18 @@
  #
 
 from pkg_resources import resource_filename
-from genshi import HTML
-from genshi.builder import tag
-from genshi.filters.transform import Transformer
 
 from trac.core import *
 from trac.ticket import model
 from trac.util.text import unicode_quote_plus
 from trac.web.api import IRequestFilter
-from trac.web.chrome import ITemplateProvider, ITemplateStreamFilter, add_notice, add_script
-from trac.ticket.roadmap import TicketGroupStats
+from trac.web.chrome import ITemplateProvider, add_notice, add_script
 from trac.util.translation import _
 
 class SubComponentsModule(Component):
     """Implements subcomponents in Trac's interface."""
     
-    implements(IRequestFilter, ITemplateProvider, ITemplateStreamFilter)
+    implements(IRequestFilter, ITemplateProvider)
  
     # IRequestFilter methods
     def pre_process_request(self, req, handler):
@@ -48,14 +44,14 @@ class SubComponentsModule(Component):
                 req.redirect(req.href.admin('ticket', 'components'))
                 
         return handler
-    
-    def post_process_request(self, req, template, data, content_type):
-        # The /query paths are handled in filter_stream()
+
+    def post_process_request(self, req, template, data, content_type=None):
         if req.path_info.startswith('/ticket/') or \
-           req.path_info.startswith('/newticket'):
+           req.path_info.startswith('/newticket') or \
+           req.path_info.startswith('/query'):
             add_script(req, 'subcomponents/componentselect.js')
-        
-                                 
+
+
         if template == "query.html":
             # Allow users to query for parent components and include all subs
             data['modes']['select'].insert(0, {'name': "begins with", 'value': "^"})
@@ -81,7 +77,7 @@ class SubComponentsModule(Component):
                         # Set the name to the base name (in case this originally
                         # is a subcomponent.
                         component['name'] = componentname
-                        
+
                         newgroups.append(component)
                     else:
                         # This is a subcomponent. Add the stats to the main component.
@@ -91,12 +87,12 @@ class SubComponentsModule(Component):
                         corecomponent = newgroups[newcomponents.index(componentname)]
                         mergedstats = corecomponent['stats'] #TicketGroupStats from trac.ticket.roadmap
                         newstats = component['stats']
-                        
+
                         # Bear with me as we go to this mess that is the group stats
                         # (or of course this hack, depending on who's viewpoint).
                         # First merge the totals
-                        mergedstats.count += newstats.count 
-                        
+                        mergedstats.count += newstats.count
+
                         # The stats are divided in intervals, merge these.
                         i = 0
                         for interval in mergedstats.intervals:
@@ -104,12 +100,12 @@ class SubComponentsModule(Component):
                             interval['count'] += newinterval['count']
                             i += 1
                         mergedstats.refresh_calcs()
-                
+
                 # Now store the new milestone component groups
                 data['groups'] = newgroups
-        return template, data, content_type        
- 
-  
+        return template, data, content_type
+
+
     # ITemplateProvider methods
     def get_htdocs_dirs(self):
         """Return the absolute path of a directory containing additional
@@ -119,7 +115,7 @@ class SubComponentsModule(Component):
 
     def get_templates_dirs(self):
         """Return the absolute path of the directory containing the provided
-        ClearSilver templates.
+        templates.
         """
         return ""
 
@@ -132,11 +128,6 @@ class SubComponentsModule(Component):
             if data['view'] == 'detail':
                 if len(self._get_component_children(data['component'].name)) > 0:
                     stream |= Transformer("//div[@class='field'][1]").after(self._build_renamechildren_field())
-        elif req.path_info.startswith('/query'):
-            # We need to load our script after the initializeFilters() call done by Trac
-            html = tag.script(type='text/javascript', charset='utf-8',
-                              src=req.href.chrome('subcomponents/componentselect.js'))
-            stream |= Transformer('//head').append(html)
         return stream
     
     
