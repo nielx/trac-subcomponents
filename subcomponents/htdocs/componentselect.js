@@ -285,15 +285,6 @@ function initialiseComponents() {
     if (typeof rename_children !== 'undefined' && rename_children)
         addRenameChildrenCheckbox();
 
-    // Legacy: is this (still) necessary?
-    // now we need to query any radio groups for Mozilla breakage: http://www.quirksmode.org/js/tests/moz_radios.html
-    var brokMoz = jQuery('input[type="radio"]');
-    if (brokMoz.length > 0) {
-        for (var i = 0; i < brokMoz.length; i++) {
-            if (brokMoz[i]) brokMoz[i].checked = brokMoz[i].defaultChecked;
-        }
-    }
-
     // Add the reverse function to jQuery, used by convertComponentSelect()
     jQuery.fn.reverse = [].reverse;
 }
