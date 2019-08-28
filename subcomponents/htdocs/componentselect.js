@@ -151,7 +151,8 @@ function convertComponentSelect(element, forceEmptyLeafs) {
     if (gComponentList.length == 0) {
         var i = 0;
         e.find('option').each(function () {
-            gComponentList[i] = jQuery(this).text().split('/');
+            // Trac 1.4 adds newlines to the options on the query.html template, so trim() the entries
+            gComponentList[i] = jQuery(this).text().trim().split('/');
             gMaxBranches = (gMaxBranches < gComponentList[i].length ? gComponentList[i].length : gMaxBranches);
             i++;
         });
