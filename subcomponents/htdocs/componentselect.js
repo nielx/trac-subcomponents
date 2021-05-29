@@ -9,28 +9,28 @@
 
 /*
  * Rewritten & maintained by Niels Sascha Reedijk <niels.reedijk@gmail.com>
- * Copyright 2012-2019.
+ * Copyright 2012-2021.
 */
 
 
 function getLeafsForLevel(level, prefix, forceEmptyLeafs) {
-    var retVal = new Array();
-    var previous = null;
+    let retVal = [];
+    let previous = null;
 
-    for (var i = 0; i < gComponentList.length; i++) {
+    for (let i = 0; i < gComponentList.length; i++) {
         // Check if the current item has the right prefix
-        if (gComponentList[i].join('/').substring(0, prefix.length) != prefix) {
+        if (gComponentList[i].join('/').substring(0, prefix.length) !== prefix) {
             continue;
         }
 
-        var current = gComponentList[i][level];
+        let current = gComponentList[i][level];
         if (!current) {
             // This item has the right prefix, but no value. This means that
             // it is an empty leaf
             current = "";
         }
 
-        if (current == previous)
+        if (current === previous)
         // this item is already in the list
             continue;
 
@@ -38,11 +38,11 @@ function getLeafsForLevel(level, prefix, forceEmptyLeafs) {
         previous = current;
     }
 
-    if (retVal.length == 0 || (retVal.length == 1 && retVal[0] == ""))
+    if (retVal.length === 0 || (retVal.length === 1 && retVal[0] === ""))
     // There are no entries, or the only entry is an empty leaf
-        return new Array();
+        return [];
 
-    if (forceEmptyLeafs && retVal[0] != "")
+    if (forceEmptyLeafs && retVal[0] !== "")
         retVal.unshift("")
 
     return retVal;
@@ -53,17 +53,17 @@ function getLeafsForLevel(level, prefix, forceEmptyLeafs) {
  */
 function selectedComponentChanged(e) {
     // Get the level of this select
-    var level = jQuery(this).prevAll('[class=haikucomponent]').length + 1;
+    let level = jQuery(this).prevAll('[class=haikucomponent]').length + 1;
 
     // Hide the deeper subcomponents (if applicable)
     jQuery(this).nextAll('[class=haikucomponent]').hide();
 
     // Check if the current selected value is an empty leaf
-    if (jQuery(this).val().length == 0) {
-        var prefix = ""
+    if (jQuery(this).val().length === 0) {
+        let prefix = ""
         jQuery(this).prevAll('[class=haikucomponent]').reverse()
             .each(function () {
-                if (prefix.length != 0)
+                if (prefix.length !== 0)
                     prefix += "/"
                 prefix += jQuery(this).val();
             });
@@ -73,10 +73,10 @@ function selectedComponentChanged(e) {
     }
 
     // Just store the new path if this is the 'highest' level
-    if (level == gMaxBranches) {
-        var prefix = ""
+    if (level === gMaxBranches) {
+        let prefix = ""
         jQuery(this).parent().find('[class=haikucomponent]').each(function () {
-            if (prefix.length != 0)
+            if (prefix.length !== 0)
                 prefix += "/";
             prefix += jQuery(this).val();
         });
@@ -91,18 +91,18 @@ function selectedComponentChanged(e) {
     // that the next select is filled, at other times, we have to go deeper,
     // for example when there are no empty leaves for a subcomponent.
 
-    var prefix = "";
+    let prefix = "";
     jQuery(this).prevAll('[class=haikucomponent]').reverse().each(function () {
         prefix += jQuery(this).val();
         prefix += "/";
     });
     prefix += jQuery(this).val();
 
-    var currentSelector = jQuery(this);
-    for (var i = level; i < gMaxBranches; i++) {
-        var items = getLeafsForLevel(i, prefix, e.data.forceEmptyLeafs);
+    let currentSelector = jQuery(this);
+    for (let i = level; i < gMaxBranches; i++) {
+        let items = getLeafsForLevel(i, prefix, e.data.forceEmptyLeafs);
 
-        for (j = 0; j < items.length; j++)
+        for (let j = 0; j < items.length; j++)
             currentSelector.next().append(jQuery("<option/>", {
                 value: items[j],
                 text: items[j]
@@ -117,7 +117,7 @@ function selectedComponentChanged(e) {
 
         // If the next selector has an empty leaf, then we are done. Otherwise
         // go deeper
-        if (items[0] == "")
+        if (items[0] === "")
             break;
 
         prefix += "/"
@@ -142,14 +142,14 @@ function selectedComponentChanged(e) {
 	                 used in the Query
 */
 function convertComponentSelect(element, forceEmptyLeafs) {
-    var e = jQuery(element);
-    var parent = jQuery(element).parent();
+    let e = jQuery(element);
+    let parent = jQuery(element).parent();
 
     gComponentCount++;
 
     // Populate the global component list if it has not been populated before
-    if (gComponentList.length == 0) {
-        var i = 0;
+    if (gComponentList.length === 0) {
+        let i = 0;
         e.find('option').each(function () {
             // Trac 1.4 adds newlines to the options on the query.html template, so trim() the entries
             gComponentList[i] = jQuery(this).text().trim().split('/');
@@ -161,7 +161,7 @@ function convertComponentSelect(element, forceEmptyLeafs) {
     }
 
     // create some replacement dropdowns
-    for (var i = 1; i <= gMaxBranches; i++) {
+    for (let i = 1; i <= gMaxBranches; i++) {
         parent.append(jQuery(document.createElement('select'))
             .attr('id', 'component-selector' + gComponentCount + '-' + i)
             .attr('class', 'haikucomponent')
@@ -169,24 +169,24 @@ function convertComponentSelect(element, forceEmptyLeafs) {
     }
 
     // Store the current selected item
-    var currentItems = e.val().split('/');
-    var currentSelectors = parent.find('[class=haikucomponent]');
-    var prefix = "";
+    let currentItems = e.val().split('/');
+    let currentSelectors = parent.find('[class=haikucomponent]');
+    let prefix = "";
 
     // Populate choice(s)
     // Note: always use currentItems.length + 1 because we want to check
     // whether there are more subselections possible
-    for (var i = 0; i < currentItems.length + 1; i++) {
-        var items = getLeafsForLevel(i, prefix, forceEmptyLeafs);
+    for (let i = 0; i < currentItems.length + 1; i++) {
+        let items = getLeafsForLevel(i, prefix, forceEmptyLeafs);
 
-        for (j = 0; j < items.length; j++) {
+        for (let j = 0; j < items.length; j++) {
             jQuery(currentSelectors[i]).append(jQuery("<option/>", {
                 value: items[j],
                 text: items[j]
             }));
         }
 
-        if (items.length == 0) {
+        if (items.length === 0) {
             break;
         }
 
@@ -194,9 +194,9 @@ function convertComponentSelect(element, forceEmptyLeafs) {
 
         // Add the current selected item to the prefix to prepare for the next
         // level
-        if (prefix.length != 0)
+        if (prefix.length !== 0)
             prefix += "/";
-        if (currentItems[i] == "")
+        if (currentItems[i] === "")
         // In case we have an 'emtpy' value, we only need to go once to get
         // the toplevel
             break;
@@ -207,8 +207,7 @@ function convertComponentSelect(element, forceEmptyLeafs) {
     jQuery(currentSelectors[currentItems.length]).nextAll().hide();
 
     // Hide the highest input if there are no options
-    var foo = jQuery(currentSelectors[currentItems.length]).children();
-    if (jQuery(currentSelectors[currentItems.length]).children().length == 0)
+    if (jQuery(currentSelectors[currentItems.length]).children().length === 0)
         jQuery(currentSelectors[currentItems.length]).hide();
 
     // Replace the current selector with a hidden input field
@@ -221,7 +220,7 @@ function convertComponentSelect(element, forceEmptyLeafs) {
     );
 }
 
-window.gComponentList = new Array();
+window.gComponentList = [];
 window.gMaxBranches = 0;
 window.gComponentCount = 0;
 
@@ -233,13 +232,13 @@ function addRenameChildrenCheckbox() {
 // This function creates a MutationObserver that will catch all newly created filters
 // on the query page and converts the component filter into a subcomponent list
 function monitorQueryComponents() {
-    var target = jQuery('table.trac-clause')[0];
+    const target = jQuery('table.trac-clause')[0];
     // Create an observer instance
-    var observer = new MutationObserver(function (mutations) {
+    const observer = new MutationObserver(function (mutations) {
         mutations.forEach(function (mutation) {
-            var newNodes = mutation.addedNodes; // DOM NodeList
+            let newNodes = mutation.addedNodes; // DOM NodeList
             if (newNodes !== null) { // If there are new nodes added
-                var selectNodes = jQuery(newNodes).find('select'); // jQuery set
+                let selectNodes = jQuery(newNodes).find('select'); // jQuery set
                 selectNodes.each(function () {
                     if (this.name.match(/[0-9]+_component$/g))
                         convertComponentSelect(this, true)
@@ -257,7 +256,7 @@ function monitorQueryComponents() {
 
 function convertBatchModifyComponent() {
     jQuery('#batchmod_component td.batchmod_property select').each(function () {
-        if (this.name == "batchmod_value_component")
+        if (this.name === "batchmod_value_component")
             convertComponentSelect(this, false);
     });
 }
@@ -269,8 +268,9 @@ function initialiseComponents() {
         monitorQueryComponents();
 
     // Query page: batch modify
-    if (jQuery('#add_batchmod_field').length)
-        jQuery('#add_batchmod_field').change(convertBatchModifyComponent);
+    let $add_batchmod_field = jQuery('#add_batchmod_field')
+    if ($add_batchmod_field.length)
+        $add_batchmod_field.change(convertBatchModifyComponent);
 
     // Query page: existing filters
     jQuery('tr.component td.filter select').each(function () {
@@ -279,12 +279,13 @@ function initialiseComponents() {
 
     // Ticket/Newticket page: component field
     // Original comment: Opera picks up .names in getElementById(), hence it being at the end now
-    if (jQuery('#field-component').length) {
-        convertComponentSelect(jQuery('#field-component')[0], false); // For the new ticket page
+    let $field_component = jQuery('#field-component')
+    if ($field_component.length) {
+        convertComponentSelect($field_component[0], false); // For the new ticket page
         // In Trac 1.2.x, the property white-space: nowrap is set, which will cause the subcomponent select
         // boxes to not wrap. See https://dev.haiku-os.org/ticket/13333
         // In Trac 1.3.x and later this is fixed. Set this property explicitly on the element.
-        jQuery('#field-component').parent().css("white-space", "normal");
+        $field_component.parent().css("white-space", "normal");
     }
     // Component Admin: add the [ ] rename children checkbox when applicable
     if (typeof rename_children !== 'undefined' && rename_children)
