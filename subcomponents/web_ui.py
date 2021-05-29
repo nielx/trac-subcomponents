@@ -1,7 +1,7 @@
- #
- # Copyright 2009-2019, Niels Sascha Reedijk <niels.reedijk@gmail.com>
- # All rights reserved. Distributed under the terms of the MIT License.
- #
+#
+# Copyright 2009-2021, Niels Sascha Reedijk <niels.reedijk@gmail.com>
+# All rights reserved. Distributed under the terms of the MIT License.
+#
 
 from pkg_resources import resource_filename
 
@@ -15,15 +15,15 @@ from trac.util.translation import _
 
 class SubComponentsModule(Component):
     """Implements subcomponents in Trac's interface."""
-    
+
     implements(IRequestFilter, ITemplateProvider)
- 
+
     # IRequestFilter methods
     def pre_process_request(self, req, handler):
         if req.path_info.startswith('/admin/ticket/components/'):
             if req.method == "POST" and 'renamechildren' in req.args:
                 if req.args.get('renamechildren') != 'on':
-                    return handler # Let trac handle this update
+                    return handler  # Let trac handle this update
                 # First process the parent component. 
                 parentcomponentname = req.path_info[25:]
                 parentcomponent = model.Component(self.env, parentcomponentname)
@@ -35,7 +35,7 @@ class SubComponentsModule(Component):
                 except self.env.db_exc.IntegrityError:
                     raise TracError(_('The component "%(name)s" already '
                                       'exists.', name=parentcomponentname))
-                    
+
                 # Now update the child components
                 childcomponents = self._get_component_children(parentcomponentname)
                 for component in childcomponents:
@@ -43,15 +43,14 @@ class SubComponentsModule(Component):
                     component.update()
                 add_notice(req, _('Your changes have been saved.'))
                 req.redirect(req.href.admin('ticket', 'components'))
-                
+
         return handler
 
     def post_process_request(self, req, template, data, content_type=None):
         if req.path_info.startswith('/ticket/') or \
-           req.path_info.startswith('/newticket') or \
-           req.path_info.startswith('/query'):
+                req.path_info.startswith('/newticket') or \
+                req.path_info.startswith('/query'):
             add_script(req, 'subcomponents/componentselect.js')
-
 
         if template == "query.html":
             # Allow users to query for parent components and include all subs
@@ -72,8 +71,10 @@ class SubComponentsModule(Component):
                         # with something URL safe (like the hrefs are)
                         new_hrefs = []
                         for interval_href in component['interval_hrefs']:
-                            new_hrefs.append(interval_href.replace(unicode_quote_plus(component['name']), '^' + componentname))
-                        component['stats_href'] = component['stats_href'].replace(unicode_quote_plus(component['name']), '^' + componentname)
+                            new_hrefs.append(
+                                interval_href.replace(unicode_quote_plus(component['name']), '^' + componentname))
+                        component['stats_href'] = component['stats_href'].replace(unicode_quote_plus(component['name']),
+                                                                                  '^' + componentname)
                         component['interval_hrefs'] = new_hrefs
                         # Set the name to the base name (in case this originally
                         # is a subcomponent.
@@ -86,7 +87,7 @@ class SubComponentsModule(Component):
                         # item is added to one, an analogous one is added to
                         # the other. This code uses that logic.
                         corecomponent = newgroups[newcomponents.index(componentname)]
-                        mergedstats = corecomponent['stats'] #TicketGroupStats from trac.ticket.roadmap
+                        mergedstats = corecomponent['stats']  # TicketGroupStats from trac.ticket.roadmap
                         newstats = component['stats']
 
                         # Bear with me as we go to this mess that is the group stats
@@ -111,7 +112,6 @@ class SubComponentsModule(Component):
                 add_script_data(req, {"rename_children": True})
 
         return template, data, content_type
-
 
     # ITemplateProvider methods
     def get_htdocs_dirs(self):
