@@ -230,9 +230,9 @@ function addRenameChildrenCheckbox() {
 }
 
 // This function creates a MutationObserver that will catch all newly created filters
-// on the query page and converts the component filter into a subcomponent list
-function monitorQueryComponents() {
-    const target = jQuery('table.trac-clause')[0];
+// on the query page, as well as the component property of the batch modify functionality,
+// and converts the component filter into a subcomponent list
+function monitorQueryPageComponents() {
     // Create an observer instance
     const observer = new MutationObserver(function (mutations) {
         mutations.forEach(function (mutation) {
@@ -240,37 +240,32 @@ function monitorQueryComponents() {
             if (newNodes !== null) { // If there are new nodes added
                 let selectNodes = jQuery(newNodes).find('select'); // jQuery set
                 selectNodes.each(function () {
+                    // query filters
                     if (this.name.match(/[0-9]+_component$/g))
                         convertComponentSelect(this, true)
+                    // batch modify component
+                    else if (this.name === "batchmod_value_component")
+                        convertComponentSelect(this, false)
                 });
             }
         });
     });
 
-    // We need to observe not only the direct children, but also the subtree below those children.
+    // For the filter, we need to observe not only the direct children, but also the subtree below those children.
     // The reason is that if the Component filter is added for the first time, it creates a direct
     // new `tbody`, but if an additional component filter is added (creating an or clause), it creates
     // a `tr` within that tbody. We also want to capture those.
-    observer.observe(target, {childList: true, subtree: true});
+    observer.observe(jQuery('table.trac-clause')[0], {childList: true, subtree: true});
+    observer.observe(jQuery('fieldset#batchmod_fieldset')[0], {childList: true, subtree: true});
 }
 
-function convertBatchModifyComponent() {
-    jQuery('#batchmod_component td.batchmod_property select').each(function () {
-        if (this.name === "batchmod_value_component")
-            convertComponentSelect(this, false);
-    });
-}
 
 function initialiseComponents() {
     // Query page: use the existence of the add_filter_* element to detect we are on the query
-    // page, and set up some code for that.
+    // page, and set up some code for that. This also monitors for when the batch modify function
+    // is used to modify the component.
     if (jQuery('[id^=add_filter_]').length)
-        monitorQueryComponents();
-
-    // Query page: batch modify
-    let $add_batchmod_field = jQuery('#add_batchmod_field')
-    if ($add_batchmod_field.length)
-        $add_batchmod_field.change(convertBatchModifyComponent);
+        monitorQueryPageComponents();
 
     // Query page: existing filters
     jQuery('tr.component td.filter select').each(function () {
