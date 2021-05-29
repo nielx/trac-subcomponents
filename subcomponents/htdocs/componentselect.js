@@ -282,10 +282,6 @@ function initialiseComponents() {
     let $field_component = jQuery('#field-component')
     if ($field_component.length) {
         convertComponentSelect($field_component[0], false); // For the new ticket page
-        // In Trac 1.2.x, the property white-space: nowrap is set, which will cause the subcomponent select
-        // boxes to not wrap. See https://dev.haiku-os.org/ticket/13333
-        // In Trac 1.3.x and later this is fixed. Set this property explicitly on the element.
-        $field_component.parent().css("white-space", "normal");
     }
     // Component Admin: add the [ ] rename children checkbox when applicable
     if (typeof rename_children !== 'undefined' && rename_children)
