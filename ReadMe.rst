@@ -1,8 +1,8 @@
 Subcomponents in Trac
 =====================
 
-Version 1.3 of this plugin is tested on Trac 1.2 and Trac 1.3.
-There are older, unmaintained, versions for Trac 1.0, 0.12 and Trac 0.11.
+Version 1.4 of this plugin is developed for and tested on Trac 1.5 and 1.6.
+There are older, unmaintained, versions for Trac 1.2, 1.0, 0.12 and Trac 0.11.
 
 What is it?
 -----------

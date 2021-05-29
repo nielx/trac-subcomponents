@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 
- #
- # Copyright 2009, Niels Sascha Reedijk <niels.reedijk@gmail.com>
- # All rights reserved. Distributed under the terms of the MIT License.
- #
+#
+# Copyright 2021, Niels Sascha Reedijk <niels.reedijk@gmail.com>
+# All rights reserved. Distributed under the terms of the MIT License.
+#
 
 from setuptools import setup
 
 setup(
     name = 'TracSubcomponents',
-    version = '1.3.1',
+    version = '1.4.0',
     packages = ['subcomponents'],
     package_data = { 'subcomponents': ['htdocs/*.js'] },
 
@@ -35,7 +35,7 @@ setup(
         'Programming Language :: Python',
     ],
     
-    install_requires = ['Trac>=1.2',],
+    install_requires = ['Trac>=1.5','Trac<1.7'],
 
     entry_points = {
         'trac.plugins': [
